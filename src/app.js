@@ -1,4 +1,11 @@
 import {
+  createShell as createShellUi,
+  createCollapsedTab as createCollapsedTabUi,
+  removeExistingUI,
+  renderError as renderErrorUi
+} from "./ui/shell.js";
+
+import {
   isRequiredTitle,
   isTextHeaderItem,
   getAssignmentIdFromModuleItem,
@@ -84,49 +91,27 @@ export function initializeApp() {
  
 
   function createShell() {
-    removeExistingUI();
-
-    if (appState.collapsed) {
-      createCollapsedTab();
-      return null;
-    }
-
-    const wrapper = document.createElement("aside");
-    wrapper.id = EXTENSION_ID;
-    wrapper.setAttribute("aria-label", "Canvas module progress tracker");
-
-    wrapper.innerHTML = `
-      <div class="cpt-header">
-        <div>
-          <strong>Module Progress</strong>
-          <span>Loading...</span>
-        </div>
-        <div class="cpt-header-actions">
-          <button id="cpt-collapse" type="button" title="Collapse panel">–</button>
-          <button id="cpt-refresh" type="button" title="Refresh progress">↻</button>
-        </div>
-      </div>
-      <div class="cpt-loading">Loading Canvas progress...</div>
-    `;
-
-    document.body.appendChild(wrapper);
-    bindHeaderButtons();
-    return wrapper;
+    return createShellUi({
+      extensionId: EXTENSION_ID,
+      tabId: TAB_ID,
+      collapsed: appState.collapsed,
+      createCollapsedTab,
+      bindHeaderButtons
+    });
   }
 
+    
+
   function createCollapsedTab() {
-    const tab = document.createElement("button");
-    tab.id = TAB_ID;
-    tab.type = "button";
-    tab.innerHTML = `<span>Progress</span><strong>›</strong>`;
-    tab.title = "Open Module Progress";
-    tab.addEventListener("click", async () => {
+  createCollapsedTabUi({
+    tabId: TAB_ID,
+    onOpen: async () => {
       appState.collapsed = false;
       await saveUiState(appState.courseId, appState.collapsed);
       await reloadDataAndRender();
-    });
-    document.body.appendChild(tab);
-  }
+    }
+  });
+}
 
   function bindHeaderButtons() {
     document.getElementById("cpt-refresh")?.addEventListener("click", init);
@@ -139,26 +124,12 @@ export function initializeApp() {
   }
 
   function renderError(wrapper, error) {
-    if (!wrapper) return;
-
-    wrapper.innerHTML = `
-      <div class="cpt-header">
-        <div>
-          <strong>Module Progress</strong>
-          <span>Error</span>
-        </div>
-        <div class="cpt-header-actions">
-          <button id="cpt-collapse" type="button" title="Collapse panel">–</button>
-          <button id="cpt-refresh" type="button" title="Refresh progress">↻</button>
-        </div>
-      </div>
-      <div class="cpt-error">
-        <strong>Could not load Canvas API data.</strong>
-        <p>${escapeHtml(error.message)}</p>
-        <p>Make sure you are not in Canvas Student View.</p>
-      </div>
-    `;
-    bindHeaderButtons();
+    renderErrorUi({
+      wrapper,
+      error,
+      escapeHtml,
+      bindHeaderButtons
+    });
   }
 
   async function getCanvasData(courseId) {
