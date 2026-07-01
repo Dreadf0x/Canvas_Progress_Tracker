@@ -1,0 +1,27 @@
+{
+  "name": "canvas_porgress_bar",
+  "version": "1.0.0",
+  "description": "A Chrome extension that adds a visual module progress tracker to Canvas.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dreadf0x/Canvas_Porgress_Bar.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Dreadf0x/Canvas_Porgress_Bar/issues"
+  },
+  "homepage": "https://github.com/Dreadf0x/Canvas_Porgress_Bar#readme",
+  "devDependencies": {
+    "esbuild": "^0.28.1"
+  }
+}

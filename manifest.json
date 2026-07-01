@@ -9,19 +9,18 @@
   "host_permissions": [
     "https://ubtech.instructure.com/*"
   ],
-  "content_scripts": [
+    "content_scripts": [
     {
       "matches": [
         "https://ubtech.instructure.com/courses/*/modules*"
       ],
       "js": [
-        "src/content/content.js"
-      ],
+       "content.js"
+    ],
       "css": [
         "css/tracker.css"
       ],
-      "run_at": "document_idle",
-      "type": "module"
+      "run_at": "document_idle"
     }
-  ]
+]
 }
