@@ -227,15 +227,12 @@ export function initializeApp() {
     
 
     if (!assignmentId) {
-      return {
-        id: item.id,
+      return createStatusResult({
+        item,
         title,
-        type: item.type || "Unknown",
         status: "not_scorable",
-        complete: false,
-        percent: null,
         detail: "Required, but no assignment ID was available."
-      };
+      });
     }
 
     const assignment = data.assignmentMap.get(Number(assignmentId));
