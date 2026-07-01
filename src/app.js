@@ -2,7 +2,8 @@ import {
   isRequiredTitle,
   isTextHeaderItem,
   getAssignmentIdFromModuleItem,
-  getRequiredItemsForModule
+  getRequiredItemsForModule,
+  analyzeModules
 } from "./progress/engine.js";
 import { canvasFetch, canvasFetchAll } from "./api/canvas.js";
 import { detectRoleFromPermissions } from "./api/roles.js";
@@ -196,142 +197,6 @@ export function initializeApp() {
       submissionMap: new Map(submissions.map((s) => [Number(s.assignment_id), s])),
       elapsedMs: Math.round(performance.now() - start)
     };
-  }
-
-
-  
-   function createStatusResult({
-    item,
-    title,
-    status,
-    complete = false,
-    percent = null,
-    detail = "",
-    score = null,
-    pointsPossible = null
-  }) {
-    return {
-        id: item.id,
-        title,
-        type: item.type || "Unknown",
-        status,
-        complete,
-        percent,
-        score,
-        pointsPossible,
-        detail
-    };
-  }
-  function analyzeItem(item, data) {
-    const title = cleanText(item.title || "Untitled item");
-    const assignmentId = getAssignmentIdFromModuleItem(item);
-    
-
-    if (!assignmentId) {
-      return createStatusResult({
-        item,
-        title,
-        status: "not_scorable",
-        detail: "Required, but no assignment ID was available."
-      });
-    }
-
-    const assignment = data.assignmentMap.get(Number(assignmentId));
-    const submission = data.submissionMap.get(Number(assignmentId));
-
-    if (!assignment || assignment._cpt_error) {
-      return createStatusResult({
-        item,
-        title,
-        status: "error",
-        detail: assignment?._cpt_error || "Assignment data unavailable."
-      });
-    }
-
-    if (!submission || submission._cpt_error || submission._cpt_unavailable) {
-      return createStatusResult({
-        item,
-        title,
-        status: "waiting",
-        detail: "Submission data unavailable for this view."
-      });
-    }
-
-    const workflow = String(submission.workflow_state || "").toLowerCase();
-    const submittedAt = submission.submitted_at;
-
-    if (!submittedAt || workflow === "unsubmitted") {
-      return createStatusResult({
-        item,
-        title,
-        status: "missing",
-        detail: "No submission found."
-      });
-    }
-
-    const score = submission.score === null || submission.score === undefined
-      ? null
-      : Number(submission.score);
-
-    if (score === null || Number.isNaN(score)) {
-      return createStatusResult({
-        item,
-        title,
-        status: "waiting",
-        detail: "Submitted, waiting for grade."
-      });
-    }
-
-    const pointsPossible = Number(assignment.points_possible);
-
-    if (!pointsPossible || Number.isNaN(pointsPossible)) {
-      return createStatusResult({
-        item,
-        title,
-        status: "graded_no_points",
-        detail: `Score ${score}; points possible unavailable.`
-      });
-    }
-
-
-    function calculateGradePercent(score, pointsPossible) {
-      return Math.round((score / pointsPossible) * 100);
-   }
-    
-   const percent = calculateGradePercent(score, pointsPossible);
-    const complete = percent >= PASSING_PERCENT;
-
-    return createStatusResult({
-      item,
-      title,
-      status: complete ? "passed" : "below_passing",
-      complete,
-      percent,
-      score,
-      pointsPossible,
-      detail: `${score}/${pointsPossible} = ${percent}%`
-    });
-  }
-  function analyzeModules(data) {
-    return data.modules.map((module) => {
-      const items = data.moduleItemsByModuleId[module.id] || [];
-      const requiredItems = getRequiredItemsForModule(module, items, appState.rules, REQUIRED_KEYWORDS);
-      const analyzedItems = requiredItems.map((item) => analyzeItem(item, data));
-      const total = analyzedItems.length;
-      const complete = analyzedItems.filter((item) => item.complete).length;
-      const percent = total === 0 ? 0 : Math.round((complete / total) * 100);
-      const rule = getRuleForModule(module.id);
-
-      return {
-        id: module.id,
-        name: module.name,
-        ruleMode: rule?.mode || "keyword",
-        total,
-        complete,
-        percent,
-        items: analyzedItems
-      };
-    });
   }
 
   function renderTracker(wrapper, courseId, data, analyzedModules) {
@@ -576,7 +441,12 @@ export function initializeApp() {
 
   function rerender() {
     const wrapper = document.getElementById(EXTENSION_ID);
-    appState.modules = analyzeModules(appState.data);
+    appState.modules = analyzeModules(
+      appState.data,
+      appState.rules,
+      REQUIRED_KEYWORDS,
+      PASSING_PERCENT
+    );
     renderTracker(wrapper, appState.courseId, appState.data, appState.modules);
   }
 
@@ -585,7 +455,12 @@ export function initializeApp() {
     if (!wrapper && appState.collapsed) return;
 
     appState.data = await getCanvasData(appState.courseId);
-    appState.modules = analyzeModules(appState.data);
+    appState.modules = analyzeModules(
+      appState.data,
+      appState.rules,
+      REQUIRED_KEYWORDS,
+      PASSING_PERCENT
+    );
     renderTracker(wrapper, appState.courseId, appState.data, appState.modules);
   }
 
@@ -608,8 +483,13 @@ export function initializeApp() {
     try {
       appState.rules = await loadRules(courseId);
       appState.data = await getCanvasData(courseId);
-      appState.modules = analyzeModules(appState.data);
-      renderTracker(wrapper, courseId, appState.data, appState.modules);
+     appState.modules = analyzeModules(
+      appState.data,
+      appState.rules,
+      REQUIRED_KEYWORDS,
+      PASSING_PERCENT
+    );
+renderTracker(wrapper, courseId, appState.data, appState.modules);
     } catch (error) {
       renderError(wrapper, error);
     }

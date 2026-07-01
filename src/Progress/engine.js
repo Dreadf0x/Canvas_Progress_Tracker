@@ -1,15 +1,20 @@
+function cleanText(value) {
+  return String(value || "").replace(/\s+/g, " ").trim();
+}
+
 export function isRequiredTitle(title, requiredKeywords) {
-  const lowered = String(title || "").replace(/\s+/g, " ").trim().toLowerCase();
+  const lowered = cleanText(title).toLowerCase();
   return requiredKeywords.some((keyword) => lowered.includes(keyword));
 }
+
 export function isTextHeaderItem(item) {
-    const type = String(item.type || "").toLowerCase();
-    return (
-        type === "subheader" ||
-        type === "text_header" ||
-        type === "contextmoduleheader"
-    );
-}// Progress engine will move here during refactor.
+  const type = String(item.type || "").toLowerCase();
+  return (
+    type === "subheader" ||
+    type === "text_header" ||
+    type === "contextmoduleheader"
+  );
+}
 
 export function getAssignmentIdFromModuleItem(item) {
   if (item.assignment_id) return Number(item.assignment_id);
@@ -37,5 +42,149 @@ export function getRequiredItemsForModule(module, moduleItems, rules, requiredKe
   return moduleItems.filter((item) => {
     if (isTextHeaderItem(item)) return false;
     return isRequiredTitle(item.title, requiredKeywords);
+  });
+}
+
+export function calculateGradePercent(score, pointsPossible) {
+  return Math.round((score / pointsPossible) * 100);
+}
+
+export function createStatusResult({
+  item,
+  title,
+  status,
+  complete = false,
+  percent = null,
+  detail = "",
+  score = null,
+  pointsPossible = null
+}) {
+  return {
+    id: item.id,
+    title,
+    type: item.type || "Unknown",
+    status,
+    complete,
+    percent,
+    score,
+    pointsPossible,
+    detail
+  };
+}
+
+export function analyzeItem(item, data, passingPercent) {
+  const title = cleanText(item.title || "Untitled item");
+  const assignmentId = getAssignmentIdFromModuleItem(item);
+
+  if (!assignmentId) {
+    return createStatusResult({
+      item,
+      title,
+      status: "not_scorable",
+      detail: "Required, but no assignment ID was available."
+    });
+  }
+
+  const assignment = data.assignmentMap.get(Number(assignmentId));
+  const submission = data.submissionMap.get(Number(assignmentId));
+
+  if (!assignment || assignment._cpt_error) {
+    return createStatusResult({
+      item,
+      title,
+      status: "error",
+      detail: assignment?._cpt_error || "Assignment data unavailable."
+    });
+  }
+
+  if (!submission || submission._cpt_error || submission._cpt_unavailable) {
+    return createStatusResult({
+      item,
+      title,
+      status: "waiting",
+      detail: "Submission data unavailable for this view."
+    });
+  }
+
+  const workflow = String(submission.workflow_state || "").toLowerCase();
+  const submittedAt = submission.submitted_at;
+
+  if (!submittedAt || workflow === "unsubmitted") {
+    return createStatusResult({
+      item,
+      title,
+      status: "missing",
+      detail: "No submission found."
+    });
+  }
+
+  const score =
+    submission.score === null || submission.score === undefined
+      ? null
+      : Number(submission.score);
+
+  if (score === null || Number.isNaN(score)) {
+    return createStatusResult({
+      item,
+      title,
+      status: "waiting",
+      detail: "Submitted, waiting for grade."
+    });
+  }
+
+  const pointsPossible = Number(assignment.points_possible);
+
+  if (!pointsPossible || Number.isNaN(pointsPossible)) {
+    return createStatusResult({
+      item,
+      title,
+      status: "graded_no_points",
+      detail: `Score ${score}; points possible unavailable.`
+    });
+  }
+
+  const percent = calculateGradePercent(score, pointsPossible);
+  const complete = percent >= passingPercent;
+
+  return createStatusResult({
+    item,
+    title,
+    status: complete ? "passed" : "below_passing",
+    complete,
+    percent,
+    score,
+    pointsPossible,
+    detail: `${score}/${pointsPossible} = ${percent}%`
+  });
+}
+
+export function analyzeModules(data, rules, requiredKeywords, passingPercent) {
+  return data.modules.map((module) => {
+    const items = data.moduleItemsByModuleId[module.id] || [];
+    const requiredItems = getRequiredItemsForModule(
+      module,
+      items,
+      rules,
+      requiredKeywords
+    );
+
+    const analyzedItems = requiredItems.map((item) =>
+      analyzeItem(item, data, passingPercent)
+    );
+
+    const total = analyzedItems.length;
+    const complete = analyzedItems.filter((item) => item.complete).length;
+    const percent = total === 0 ? 0 : Math.round((complete / total) * 100);
+    const rule = rules[String(module.id)] || null;
+
+    return {
+      id: module.id,
+      name: module.name,
+      ruleMode: rule?.mode || "keyword",
+      total,
+      complete,
+      percent,
+      items: analyzedItems
+    };
   });
 }
