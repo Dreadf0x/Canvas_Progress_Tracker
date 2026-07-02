@@ -148,17 +148,24 @@ export function renderTracker({
     `
       : "";
 
+  
   wrapper.innerHTML = `
-   <div class="cpt-header">
-    <div class="cpt-header-title">
-      <div class="cpt-header-icon">▮▮▮</div>
-      <div>
-        <h2>Wayfinder</h2>
-        <strong>Course Progress Tracker</strong>
-        <span>${isInstructor ? "Instructor" : "Student"} View · ${passingPercent}%+</span>
+    <div class="cpt-header">
+      <div class="cpt-header-title">
+        <img
+          class="cpt-header-logo"
+          src="${chrome.runtime.getURL("assets/branding/Wayfinder_White.svg")}"
+          alt=""
+        >
+        <div class="cpt-header-copy">
+          <h2>Wayfinder</h2>
+          <strong>Course Progress Tracker</strong>
+          <span>${isInstructor ? "Instructor" : "Student"} View · ${passingPercent}%+</span>
+        </div>
       </div>
-    </div>
-  <div class="cpt-header-actions">
+
+      <div class="cpt-header-actions">    
+
         <button id="cpt-theme-button" type="button" title="Appearance">
           ⚙
         </button>

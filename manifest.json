@@ -1,26 +1,40 @@
 {
   "manifest_version": 3,
-  "name": "Canvas Progress Bar",
+  "name": "Wayfinder",
   "version": "0.6.1",
-  "description": "Canvas module progress tracker with instructor rules, role detection, and collapsible panel.",
+  "description": "Course progress tracker for Canvas LMS.",
+
   "permissions": [
     "storage"
   ],
+
   "host_permissions": [
     "https://ubtech.instructure.com/*"
   ],
-    "content_scripts": [
+
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "assets/branding/Wayfinder_White.svg"
+      ],
+      "matches": [
+        "https://ubtech.instructure.com/*"
+      ]
+    }
+  ],
+
+  "content_scripts": [
     {
       "matches": [
         "https://ubtech.instructure.com/courses/*/modules*"
       ],
       "js": [
-       "content.js"
-    ],
+        "content.js"
+      ],
       "css": [
         "css/tracker.css"
       ],
       "run_at": "document_idle"
     }
-]
+  ]
 }
