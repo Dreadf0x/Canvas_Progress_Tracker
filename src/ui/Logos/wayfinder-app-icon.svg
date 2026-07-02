@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Wayfinder app icon</title>
+  <desc id="desc">Orange rounded square with white Wayfinder mark.</desc>
+  <defs>
+    <linearGradient id="bg" x1="20" y1="112" x2="108" y2="16" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#d96f16"/>
+      <stop offset="0.6" stop-color="#f58220"/>
+      <stop offset="1" stop-color="#ff9b3d"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="112" height="112" rx="26" fill="url(#bg)"/>
+  <g fill="#fff" transform="translate(8 8) scale(.875)">
+    <path d="M64 10 77 52 64 44 51 52z"/>
+    <path d="M64 50 75 64H53z"/>
+    <path d="M17 60h18a31 31 0 0 1 23-27l-4-13A45 45 0 0 0 21 55z"/>
+    <path d="M93 60h18l-4-5a45 45 0 0 0-33-35l-4 13a31 31 0 0 1 23 27z"/>
+    <path d="M17 68h18a31 31 0 0 0 9 18L25 105A45 45 0 0 1 21 73z"/>
+    <path d="M93 68h18l-4 5a45 45 0 0 1-33 35l-4-13a31 31 0 0 0 23-27z"/>
+    <path d="M64 70c-15 0-20 5-20 10 0 10 22 7 22 14 0 3-5 6-18 8 24 3 38-4 38-14 0-12-23-9-23-15 0-2 5-4 13-5-4-2-8-3-12-3z"/>
+    <path d="M55 76c-16 10-25 25-25 39 10-15 25-26 48-33-6-2-14-3-23-6z"/>
+  </g>
+</svg>
