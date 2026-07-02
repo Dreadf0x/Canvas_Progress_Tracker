@@ -81,20 +81,7 @@ html[data-cpt-theme="ubtech"] {
   background: var(--cpt-panel);
 }
 
-.cpt-header strong,
-.cpt-settings-head strong {
-  display: block;
-  font-size: 16px;
-}
 
-.cpt-header span,
-.cpt-settings-head span {
-  display: block;
-  margin-top: 3px;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--cpt-text-muted);
-}
 
 .cpt-header-actions {
   display: flex;
@@ -594,9 +581,10 @@ html[data-cpt-theme="forest"] {
   width: 42px;
   height: 42px;
   padding: 0;
-  border: none;
   border-radius: 12px;
-  background: #f39a52;
+  background: rgba(255,255,255,.24);
+  border: 1px solid rgba(255,255,255,.28);
+  backdrop-filter: blur(6px);
   color: #ffffff;
   display: flex;
   align-items: center;

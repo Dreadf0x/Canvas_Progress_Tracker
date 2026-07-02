@@ -4,7 +4,7 @@ import {
   removeExistingUI,
   renderError as renderErrorUi
 } from "./ui/shell.js";
-
+import { renderSettingsPanel as renderSettingsPanelHtml } from "./ui/settings.js";
 import {
   isRequiredTitle,
   isTextHeaderItem,
@@ -16,9 +16,7 @@ import { canvasFetch, canvasFetchAll } from "./api/canvas.js";
 import { detectRoleFromPermissions } from "./api/roles.js";
 import { loadRules, saveRules, loadUiState, saveUiState } from "./storage/rules.js";
 import {
-  getStatusInfo,
   renderItem,
-  renderModule,
   renderTracker
 } from "./ui/panel.js";
 import { applyTheme, THEMES } from "./themes/themes.js";
@@ -324,12 +322,11 @@ export function initializeApp() {
     }
 
     appState.courseId = courseId;
-    applyTheme(THEMES.ubtech);
     const uiState = await loadUiState(courseId);
     appState.collapsed = Boolean(uiState.collapsed);
     appState.theme = uiState.theme || THEMES.ubtech;
     applyTheme(appState.theme);
-    appState.collapsed = Boolean(uiState.collapsed);
+   
 
     const wrapper = createShell();
     if (!wrapper && appState.collapsed) return;
