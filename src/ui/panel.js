@@ -159,8 +159,6 @@ export function renderTracker({
         >
         <div class="cpt-header-copy">
           <h2>Wayfinder</h2>
-          <strong>Course Progress Tracker</strong>
-          <span>${isInstructor ? "Instructor" : "Student"} View · ${passingPercent}%+</span>
         </div>
       </div>
 
@@ -185,20 +183,37 @@ export function renderTracker({
 
     <div class="cpt-overall">
       <div class="cpt-module-topline">
-        <span class="cpt-module-title">Overall Required Progress</span>
+        <span class="cpt-module-title">Overall Progress</span>
         <span class="cpt-module-percent">${overallPercent}%</span>
       </div>
       <div class="cpt-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${overallPercent}">
         <div class="cpt-bar-fill" style="width: ${overallPercent}%"></div>
       </div>
-      <div class="cpt-status">${overallComplete}/${overallTotal} required items passed</div>
+      <div class="cpt-status">${overallComplete}/${overallTotal} Completed</div>
     </div>
 
     <div class="cpt-summary">
-      <span>Waiting: ${waitingCount}</span>
-      <span>Below 80%: ${belowCount}</span>
-      <span>Missing: ${missingCount}</span>
-      ${isInstructor ? `<span>Custom Rules: ${customRuleCount}</span>` : ""}
+
+      <div class="cpt-stat-card">
+        <div class="cpt-stat-number">${overallComplete}</div>
+        <div class="cpt-stat-label">Completed</div>
+      </div>
+
+      <div class="cpt-stat-card">
+        <div class="cpt-stat-number">${waitingCount}</div>
+        <div class="cpt-stat-label">Awaiting Grade</div>
+      </div>
+
+      <div class="cpt-stat-card">
+        <div class="cpt-stat-number">${missingCount}</div>
+        <div class="cpt-stat-label">Missing</div>
+      </div>
+
+      <div class="cpt-stat-card">
+        <div class="cpt-stat-number">${belowCount}</div>
+        <div class="cpt-stat-label">Below 80%</div>
+      </div>
+
     </div>
 
     <div class="cpt-body">${moduleRows}</div>
