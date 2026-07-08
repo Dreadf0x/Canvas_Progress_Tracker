@@ -168,7 +168,6 @@ export function renderTracker({
           ⚙
         </button>
         <div id="cpt-theme-menu" class="cpt-theme-menu" hidden>
-          <button type="button" data-theme="default">Default</button>
           <button type="button" data-theme="ubtech">UBTech</button>
           <button type="button" data-theme="slate">Slate</button>
           <button type="button" data-theme="forest">Forest</button>
