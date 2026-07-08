@@ -30,7 +30,7 @@ export function initializeApp() {
   const EXTENSION_ID = "cpt-progress-tracker";
   const TAB_ID = "cpt-progress-tab";
   const PASSING_PERCENT = 80;
-  const REQUIRED_KEYWORDS = ["training", "lab", "important", "assessment"];
+  const REQUIRED_KEYWORDS = ["training", "important", "assessment"];
   const DEBUG_MODE = true;
 
   let appState = {
