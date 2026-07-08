@@ -36,8 +36,8 @@ export const THEMES = {
   }
 };
 
-export function getTheme(themeId = "default") {
-  return THEMES[themeId] || THEMES.default;
+export function getTheme(themeId = "ubtech") {
+  return THEMES[themeId] || THEMES.ubtech;
 }
 
 export function applyTheme(themeId = "ubtech") {

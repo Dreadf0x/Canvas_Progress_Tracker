@@ -93,6 +93,7 @@ export function renderTracker({
   debugMode,
   passingPercent,
   theme,
+  themeLogo,
   themes
 }) {
   if (!wrapper) return;
@@ -154,7 +155,7 @@ export function renderTracker({
       <div class="cpt-header-title">
         <img
           class="cpt-header-logo"
-          src="${chrome.runtime.getURL("assets/branding/Wayfinder_White.svg")}"
+          src="${chrome.runtime.getURL(themeLogo)}"
           alt=""
         >
         <div class="cpt-header-copy">

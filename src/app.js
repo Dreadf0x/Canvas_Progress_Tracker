@@ -19,7 +19,7 @@ import {
   renderItem,
   renderTracker
 } from "./ui/panel.js";
-import { applyTheme, THEMES } from "./themes/themes.js";
+import { applyTheme, THEMES, getTheme } from "./themes/themes.js";
 
 
 
@@ -82,7 +82,8 @@ export function initializeApp() {
       debugMode: DEBUG_MODE,
       passingPercent: PASSING_PERCENT,
       theme: appState.theme,
-      themes: THEMES
+      themes: THEMES,
+      themeLogo: getTheme(appState.theme).logo
     });
   }
 
