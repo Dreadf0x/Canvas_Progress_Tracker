@@ -30,7 +30,8 @@ export function initializeApp() {
   const isPeoplePage = /\/courses\/\d+\/users/.test(window.location.pathname);
 
   if (isPeoplePage) {
-    console.log("Wayfinder People page detected.");
+   console.log("Wayfinder People page detected.");
+    showLoading("Wayfinder People View loading...");
     return;
   }
 
