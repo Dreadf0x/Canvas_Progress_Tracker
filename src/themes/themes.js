@@ -37,9 +37,14 @@ export const THEMES = {
 };
 
 export function getTheme(themeId = "ubtech") {
-  return THEMES[themeId] || THEMES.ubtech;
+  const id =
+    typeof themeId === "string"
+      ? themeId
+      : themeId?.id || "ubtech";
+
+  return THEMES[id] || THEMES.ubtech;
 }
 
 export function applyTheme(themeId = "ubtech") {
-  document.documentElement.dataset.cptTheme = themeId;
+  document.documentElement.dataset.cptTheme = getTheme(themeId).id;
 }

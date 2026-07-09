@@ -40,7 +40,7 @@ export function initializeApp() {
     rules: {},
     showSettingsForModuleId: null,
     collapsed: false,
-    theme: THEMES.ubtech,
+    theme: THEMES.ubtech.id,
     role: "student"
   };
 
@@ -327,7 +327,7 @@ export function initializeApp() {
     appState.courseId = courseId;
     const uiState = await loadUiState(courseId);
     appState.collapsed = Boolean(uiState.collapsed);
-    appState.theme = uiState.theme || THEMES.ubtech;
+    appState.theme = getTheme(uiState.theme).id;
     applyTheme(appState.theme);
    
 
