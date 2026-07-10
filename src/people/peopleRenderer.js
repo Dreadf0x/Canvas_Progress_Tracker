@@ -2,11 +2,22 @@ import { renderRadarSummaryCard } from "./components/radarSummaryCard.js";
 import { renderStudentRadarTable } from "./components/studentRadarTable.js";
 import { renderRequiredItemsPanel } from "./components/requiredItemsPanel.js";
 
+function getEmptySummaryGroups() {
+  return {
+    onTrack: [],
+    watchList: [],
+    atRisk: [],
+    inactive: [],
+    endDateAlert: []
+  };
+}
+
 export function renderStudentRadar({
   students = [],
   assignments = [],
   selectedAssignmentIds = [],
   endDates = {},
+  summaryGroups = getEmptySummaryGroups(),
   loading = false,
   error = null
 } = {}) {
@@ -16,7 +27,9 @@ export function renderStudentRadar({
       <div class="cpt-overall">
         <div class="cpt-module-topline">
           <div class="cpt-radar-heading">
-            <span class="cpt-module-title">Wayfinder Student Radar</span>
+            <span class="cpt-module-title">
+              Wayfinder Student Radar
+            </span>
 
             <button
               type="button"
@@ -26,6 +39,7 @@ export function renderStudentRadar({
               Required Items (${selectedAssignmentIds.length})
             </button>
           </div>
+
           ${renderRequiredItemsPanel({
             assignments,
             selectedIds: selectedAssignmentIds
@@ -34,13 +48,36 @@ export function renderStudentRadar({
       </div>
 
       <div class="cpt-summary cpt-radar-summary">
-        ${renderRadarSummaryCard("On Track", 0)}
-        ${renderRadarSummaryCard("Watch List", 0)}
-        ${renderRadarSummaryCard("At Risk", 0)}
-        ${renderRadarSummaryCard("Inactive", 0)}
+        ${renderRadarSummaryCard({
+          label: "On Track",
+          students: summaryGroups.onTrack,
+          emptyMessage: "No unfinished students were active within the last 5 days."
+        })}
+
+        ${renderRadarSummaryCard({
+          label: "Watch List",
+          students: summaryGroups.watchList,
+          emptyMessage: "No unfinished students have been inactive for 5–9 days."
+        })}
+
+        ${renderRadarSummaryCard({
+          label: "At Risk",
+          students: summaryGroups.atRisk,
+          emptyMessage: "No unfinished students have been inactive for 10–99 days."
+        })}
+
+        ${renderRadarSummaryCard({
+          label: "Inactive",
+          students: summaryGroups.inactive,
+          emptyMessage: "No unfinished students have been inactive for 100+ days."
+        })}
+
+        ${renderRadarSummaryCard({
+          label: "End Date Alert",
+          students: summaryGroups.endDateAlert,
+          emptyMessage: "No unfinished students are within 10 days of their end date."
+        })}
       </div>
-
-
 
       <div class="cpt-radar-filters">
         <label class="cpt-radar-filter">
@@ -64,10 +101,10 @@ export function renderStudentRadar({
 
       <div class="cpt-body">
         ${renderStudentRadarTable({
-            students,
-            endDates,
-            loading,
-            error
+          students,
+          endDates,
+          loading,
+          error
         })}
       </div>
 

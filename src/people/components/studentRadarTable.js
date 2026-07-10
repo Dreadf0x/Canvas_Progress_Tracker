@@ -108,11 +108,21 @@ export function renderStudentRadarTable({
             </td>
 
             <td>
-              ${renderRadarProgressBar(student.submittedPercent)}
+              ${renderRadarProgressBar({
+                percent: student.submittedPercent,
+                tooltipTitle: "Required Items Not Submitted",
+                items: student.missingSubmissionItems || [],
+                completeMessage: "All required items submitted"
+              })}
             </td>
 
             <td>
-              ${renderRadarProgressBar(student.gradedPercent)}
+              ${renderRadarProgressBar({
+                percent: student.gradedPercent,
+                tooltipTitle: "Required Items Not Yet Graded",
+                items: student.ungradedItems || [],
+                completeMessage: "All required items graded"
+              })}
             </td>
 
             <td>

@@ -384,3 +384,226 @@ body #cpt-progress-tracker:has(.cpt-student-radar) {
 .cpt-radar-filter input {
   margin: 0;
 }
+
+/* ===========================
+   Compact Student Radar Tooltips
+=========================== */
+
+.cpt-radar-progress-wrapper {
+  position: relative;
+  display: block;
+  width: 100%;
+  border-radius: 4px;
+}
+
+.cpt-radar-progress-wrapper:focus,
+.cpt-radar-summary-card:focus {
+  outline: 2px solid var(--cpt-accent);
+  outline-offset: 2px;
+}
+
+.cpt-radar-progress-wrapper:focus:not(:focus-visible),
+.cpt-radar-summary-card:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/*
+ * Shared compact tooltip appearance.
+ */
+.cpt-radar-progress-tooltip,
+.cpt-radar-summary-tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  z-index: 10030;
+
+  width: 270px;
+  max-width: calc(100vw - 32px);
+
+  padding: 7px 8px;
+
+  background: var(--cpt-panel-secondary);
+  color: var(--cpt-text);
+
+  border: 1px solid var(--cpt-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+
+  text-align: left;
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transform: translate(-50%, 3px);
+
+  transition:
+    opacity 80ms ease,
+    transform 80ms ease,
+    visibility 80ms ease;
+}
+
+.cpt-radar-progress-tooltip::after,
+.cpt-radar-summary-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+
+  width: 7px;
+  height: 7px;
+
+  background: var(--cpt-panel-secondary);
+  border-right: 1px solid var(--cpt-border);
+  border-bottom: 1px solid var(--cpt-border);
+
+  transform: translate(-50%, -4px) rotate(45deg);
+}
+
+.cpt-radar-progress-wrapper:hover
+  .cpt-radar-progress-tooltip,
+.cpt-radar-progress-wrapper:focus
+  .cpt-radar-progress-tooltip,
+.cpt-radar-progress-wrapper:focus-within
+  .cpt-radar-progress-tooltip,
+.cpt-radar-summary-card:hover
+  .cpt-radar-summary-tooltip,
+.cpt-radar-summary-card:focus
+  .cpt-radar-summary-tooltip,
+.cpt-radar-summary-card:focus-within
+  .cpt-radar-summary-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+
+/*
+ * Tooltip headings.
+ */
+.cpt-radar-tooltip-title,
+.cpt-summary-tooltip-title {
+  margin: 0 0 4px;
+  padding: 0 0 4px;
+
+  border-bottom: 1px solid var(--cpt-border);
+
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1.2;
+  color: var(--cpt-text);
+
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/*
+ * Lists.
+ */
+.cpt-radar-tooltip-list,
+.cpt-summary-tooltip-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/*
+ * Each assignment or student occupies one compact line.
+ */
+.cpt-radar-tooltip-item,
+.cpt-summary-tooltip-item {
+  display: block;
+
+  margin: 0;
+  padding: 2px 0;
+
+  border: 0;
+
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--cpt-text);
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/*
+ * Summary-card student names and details stay on the same line.
+ */
+.cpt-summary-tooltip-student-name {
+  font: inherit;
+  color: inherit;
+}
+
+.cpt-summary-tooltip-detail {
+  margin: 0;
+
+  font-size: inherit;
+  font-weight: 600;
+  line-height: inherit;
+  color: var(--cpt-text-muted);
+}
+
+/*
+ * "+X more" line.
+ */
+.cpt-radar-tooltip-more,
+.cpt-summary-tooltip-more {
+  margin-top: 4px;
+  padding-top: 4px;
+
+  border-top: 1px solid var(--cpt-border);
+
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--cpt-text-muted);
+}
+
+/*
+ * Messages shown when nothing is missing or no students
+ * are in the selected alert category.
+ */
+.cpt-radar-tooltip-complete,
+.cpt-summary-tooltip-empty {
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--cpt-text-muted);
+}
+
+/* ===========================
+   Student Radar Summary Cards
+=========================== */
+
+.cpt-radar-summary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.cpt-radar-summary-card {
+  position: relative;
+  min-width: 0;
+  cursor: default;
+}
+
+.cpt-radar-summary-card:focus {
+  outline: 2px solid var(--cpt-accent);
+  outline-offset: 3px;
+}
+
+.cpt-radar-summary-card:focus:not(:focus-visible) {
+  outline: none;
+}
+
+
+/*
+ * Allow the five cards to wrap on narrower versions of the panel.
+ */
+@media (max-width: 700px) {
+  .cpt-radar-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
