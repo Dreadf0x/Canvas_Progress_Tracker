@@ -7,22 +7,10 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-const MAX_TOOLTIP_ITEMS = 10;
-
 function renderTooltipItems(items = []) {
-  const visibleItems = items.slice(
-    0,
-    MAX_TOOLTIP_ITEMS
-  );
-
-  const remainingCount = Math.max(
-    0,
-    items.length - MAX_TOOLTIP_ITEMS
-  );
-
   return `
     <ul class="cpt-radar-tooltip-list">
-      ${visibleItems
+      ${items
         .map(
           (item) => `
             <li class="cpt-radar-tooltip-item">
@@ -34,16 +22,6 @@ function renderTooltipItems(items = []) {
         )
         .join("")}
     </ul>
-
-    ${
-      remainingCount > 0
-        ? `
-          <div class="cpt-radar-tooltip-more">
-            +${remainingCount} more
-          </div>
-        `
-        : ""
-    }
   `;
 }
 

@@ -6,11 +6,16 @@ import {
 
 import { renderStudentRadar } from "./peopleRenderer.js";
 
+
+import { initializeRadarTooltips } from "./radarTooltips.js";
+
 import {
   loadEndDates,
   loadRequiredItemIds,
+  loadRadarUiState,
   saveEndDate,
-  saveRequiredItemIds
+  saveRequiredItemIds,
+  saveRadarUiState
 } from "./peopleStorage.js";
 
 function loadRadarStyles() {
@@ -313,7 +318,6 @@ function bindStudentFilters(panel) {
 
   applyFilters();
 }
-
 function bindEndDateInputs({
   panel,
   courseId
@@ -323,11 +327,37 @@ function bindEndDateInputs({
   );
 
   for (const input of endDateInputs) {
-    input.addEventListener("change", async () => {
+    const originalValue = input.value;
+
+    /*
+     * Save only after the instructor leaves the date field.
+     * Saving on "change" can interrupt typing the year because
+     * Student Radar rerenders immediately after the save.
+     */
+    input.addEventListener("blur", async () => {
       const studentId = input.dataset.studentId;
       const endDate = input.value;
 
       if (!studentId) {
+        return;
+      }
+
+      /*
+       * Do nothing when the value was not changed.
+       */
+      if (endDate === originalValue) {
+        return;
+      }
+
+      /*
+       * A date input should contain either a complete
+       * YYYY-MM-DD value or an empty string.
+       */
+      const isValidDate =
+        endDate === "" ||
+        /^\d{4}-\d{2}-\d{2}$/.test(endDate);
+
+      if (!isValidDate) {
         return;
       }
 
@@ -341,8 +371,8 @@ function bindEndDateInputs({
         );
 
         /*
-         * Reload Student Radar so the End Date Alert card
-         * immediately reflects the newly saved date.
+         * Reload Student Radar after the field loses focus
+         * so the End Date Alert summary card recalculates.
          */
         panel.remove();
         await initializePeopleView();
@@ -433,6 +463,101 @@ function bindRequiredItemsPanel({
   );
 }
 
+function removeRadarUi() {
+  document
+    .querySelector("#cpt-progress-tracker")
+    ?.remove();
+
+  document
+    .querySelector("#cpt-radar-collapsed-tab")
+    ?.remove();
+}
+
+function createRadarCollapsedTab(courseId) {
+  document
+    .querySelector("#cpt-radar-collapsed-tab")
+    ?.remove();
+
+  const tab = document.createElement("button");
+
+  tab.id = "cpt-radar-collapsed-tab";
+  tab.className = "cpt-radar-collapsed-tab";
+  tab.type = "button";
+
+  tab.title = "Open Wayfinder Student Radar";
+  tab.setAttribute(
+    "aria-label",
+    "Open Wayfinder Student Radar"
+  );
+
+  tab.innerHTML = `
+    <span class="cpt-radar-collapsed-tab-text">
+      Student Radar
+    </span>
+
+    <span
+      class="cpt-radar-collapsed-tab-arrow"
+      aria-hidden="true"
+    >
+      ‹
+    </span>
+  `;
+
+  tab.addEventListener("click", async () => {
+    tab.disabled = true;
+
+    try {
+      await saveRadarUiState(courseId, {
+        collapsed: false
+      });
+
+      tab.remove();
+      await initializePeopleView();
+    } catch (error) {
+      console.error(
+        "Wayfinder could not reopen Student Radar:",
+        error
+      );
+
+      tab.disabled = false;
+    }
+  });
+
+  document.body.appendChild(tab);
+}
+
+function bindRadarCollapseButton({
+  panel,
+  courseId
+}) {
+  const collapseButton = panel.querySelector(
+    "#cpt-radar-collapse"
+  );
+
+  collapseButton?.addEventListener(
+    "click",
+    async () => {
+      collapseButton.disabled = true;
+
+      try {
+        await saveRadarUiState(courseId, {
+          collapsed: true
+        });
+
+        panel.remove();
+        createRadarCollapsedTab(courseId);
+      } catch (error) {
+        console.error(
+          "Wayfinder could not collapse Student Radar:",
+          error
+        );
+
+        collapseButton.disabled = false;
+      }
+    }
+  );
+}
+
 export async function initializePeopleView() {
   loadRadarStyles();
 
@@ -442,9 +567,16 @@ export async function initializePeopleView() {
     return;
   }
 
-  document
-    .querySelector("#cpt-progress-tracker")
-    ?.remove();
+  removeRadarUi();
+
+  const radarUiState =
+    await loadRadarUiState(courseId);
+
+  if (radarUiState.collapsed) {
+    createRadarCollapsedTab(courseId);
+    return;
+  }
+
 
   const panel = document.createElement("div");
   panel.id = "cpt-progress-tracker";
@@ -661,7 +793,15 @@ export async function initializePeopleView() {
       panel,
       courseId
     });
-  } catch (error) {
+
+    bindRadarCollapseButton({
+      panel,
+      courseId
+    });
+
+    initializeRadarTooltips(panel);
+
+   } catch (error) {
     console.error(
       "Wayfinder Student Radar error:",
       error

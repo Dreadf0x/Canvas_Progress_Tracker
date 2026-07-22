@@ -52,3 +52,29 @@ export async function clearRequiredItemIds(courseId) {
   const key = getRequiredItemsKey(courseId);
   await chrome.storage.local.remove(key);
 }
+
+function getRadarUiStateKey(courseId) {
+  return `wayfinder_student_radar_ui_${courseId}`;
+}
+
+export async function loadRadarUiState(courseId) {
+  const key = getRadarUiStateKey(courseId);
+  const result = await chrome.storage.local.get(key);
+
+  return {
+    collapsed: Boolean(result[key]?.collapsed)
+  };
+}
+
+export async function saveRadarUiState(
+  courseId,
+  uiState
+) {
+  const key = getRadarUiStateKey(courseId);
+
+  await chrome.storage.local.set({
+    [key]: {
+      collapsed: Boolean(uiState?.collapsed)
+    }
+  });
+}
